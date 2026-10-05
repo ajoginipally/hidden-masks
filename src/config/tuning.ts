@@ -13,6 +13,8 @@ export interface Tuning {
   sensitivityY: number;
   /** Multiplies normalized head Z (distance) before it reaches the camera. */
   depthSensitivity: number;
+  /** Let tracked head Z move the eye toward/away from the screen. Off = fixed eyeDistance. */
+  enableHeadDepth: boolean;
   /** Normalized head Z treated as "normal distance" (no depth response). */
   depthDeadZone: number;
   /** Exponential smoothing time constant for eye distance, seconds. 0 = immediate. */
@@ -23,6 +25,8 @@ export interface Tuning {
   maxEyeDistanceScale: number;
   /** Exponential smoothing time constant in seconds. 0 = raw input. */
   smoothing: number;
+  /** Normalized head X/Y treated as still (no eye travel). */
+  headDeadZone: number;
   /** Global multiplier on eye displacement. 0 = no parallax at all. */
   perspectiveStrength: number;
   /** World units of horizontal eye travel per unit of normalized head X. */
@@ -66,11 +70,13 @@ export const DEFAULT_TUNING: Tuning = {
   sensitivityX: 1,
   sensitivityY: 1,
   depthSensitivity: 1,
+  enableHeadDepth: false,
   depthDeadZone: 0.08,
   depthSmoothing: 0.4,
   minEyeDistanceScale: 0.75,
   maxEyeDistanceScale: 1.4,
-  smoothing: 0.05,
+  smoothing: 0.14,
+  headDeadZone: 0.04,
   perspectiveStrength: 1,
   exaggerationX: 1.3,
   exaggerationY: 1.0,

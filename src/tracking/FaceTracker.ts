@@ -118,8 +118,8 @@ export class FaceTracker implements HeadPoseSource {
   private reacquire = 0;
 
   private readonly filters = {
-    x: new OneEuroFilter(1.2, 4),
-    y: new OneEuroFilter(1.2, 4),
+    x: new OneEuroFilter(0.7, 1.8),
+    y: new OneEuroFilter(0.7, 1.8),
     z: new OneEuroFilter(0.4, 1.5),
   };
 

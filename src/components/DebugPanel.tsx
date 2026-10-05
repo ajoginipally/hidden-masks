@@ -31,6 +31,7 @@ const VIEW_SLIDERS: SliderDef[] = [
   { key: 'minEyeDistanceScale', label: 'Min eye distance scale', min: 0.4, max: 1, step: 0.05 },
   { key: 'maxEyeDistanceScale', label: 'Max eye distance scale', min: 1, max: 2.5, step: 0.05 },
   { key: 'smoothing', label: 'Smoothing (s)', min: 0, max: 0.4, step: 0.005 },
+  { key: 'headDeadZone', label: 'Head dead zone', min: 0, max: 0.2, step: 0.005 },
   { key: 'perspectiveStrength', label: 'Perspective strength', min: 0, max: 2, step: 0.05 },
   { key: 'exaggerationX', label: 'Horizontal exaggeration', min: 0, max: 3, step: 0.05 },
   { key: 'exaggerationY', label: 'Vertical exaggeration', min: 0, max: 3, step: 0.05 },
@@ -146,6 +147,7 @@ export function DebugPanel({ open }: { open: boolean }) {
         {VIEW_SLIDERS.map((def) => (
           <Slider key={def.key} def={def} value={t[def.key]} />
         ))}
+        <Toggle k="enableHeadDepth" label={`HEAD DEPTH: ${t.enableHeadDepth ? 'ON' : 'OFF'}`} value={t.enableHeadDepth} />
         <Toggle k="showTrackingDot" label="Show tracking dot" value={t.showTrackingDot} />
       </section>
 

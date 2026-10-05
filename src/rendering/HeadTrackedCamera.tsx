@@ -45,8 +45,11 @@ export function HeadTrackedCamera() {
     s.z += (raw.z - s.z) * a;
     s.confidence = raw.confidence;
 
-    let ex = s.x * t.sensitivityX * t.exaggerationX * t.perspectiveStrength;
-    let ey = s.y * t.sensitivityY * t.exaggerationY * t.perspectiveStrength;
+    const dz = t.headDeadZone;
+    const hx = Math.sign(s.x) * Math.max(0, Math.abs(s.x) - dz);
+    const hy = Math.sign(s.y) * Math.max(0, Math.abs(s.y) - dz);
+    let ex = hx * t.sensitivityX * t.exaggerationX * t.perspectiveStrength;
+    let ey = hy * t.sensitivityY * t.exaggerationY * t.perspectiveStrength;
     const r = Math.hypot(ex, ey);
     if (r > t.maxDisplacement && r > 0) {
       ex *= t.maxDisplacement / r;
@@ -55,10 +58,12 @@ export function HeadTrackedCamera() {
     // Depth: ignore small distance changes, stay within limits, and ease slowly.
     const zMag = Math.max(0, Math.abs(s.z) - t.depthDeadZone);
     const z = Math.sign(s.z) * zMag;
-    const targetEz = Math.min(
-      t.eyeDistance * t.maxEyeDistanceScale,
-      Math.max(t.eyeDistance * t.minEyeDistanceScale, t.eyeDistance * (1 + z * t.depthSensitivity)),
-    );
+    const targetEz = t.enableHeadDepth
+      ? Math.min(
+          t.eyeDistance * t.maxEyeDistanceScale,
+          Math.max(t.eyeDistance * t.minEyeDistanceScale, t.eyeDistance * (1 + z * t.depthSensitivity)),
+        )
+      : t.eyeDistance;
     if (smoothedEz.current === null) smoothedEz.current = t.eyeDistance;
     const az = t.depthSmoothing <= 0 ? 1 : 1 - Math.exp(-dt / t.depthSmoothing);
     smoothedEz.current += (targetEz - smoothedEz.current) * az;
