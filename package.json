@@ -1,0 +1,33 @@
+{
+  "name": "hidden-masks",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "predev": "node scripts/copy-mediapipe.mjs",
+    "dev": "vite",
+    "prebuild": "node scripts/copy-mediapipe.mjs",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "tunnel": "ngrok http 5173",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "1.0.1",
+    "@react-three/fiber": "^9.8.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.186.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2"
+  }
+}
