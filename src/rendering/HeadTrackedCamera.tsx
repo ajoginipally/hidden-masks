@@ -19,6 +19,7 @@ export function HeadTrackedCamera() {
   const size = useThree((s) => s.size);
   const camera = useMemo(() => new OffAxisCamera(), []);
   const smoothed = useRef(neutralPose());
+  const smoothedEz = useRef<number | null>(null);
 
   useLayoutEffect(() => {
     const previous = get().camera;
@@ -51,9 +52,18 @@ export function HeadTrackedCamera() {
       ex *= t.maxDisplacement / r;
       ey *= t.maxDisplacement / r;
     }
-    const ez = t.eyeDistance * (1 + s.z * t.depthSensitivity);
+    // Depth: ignore small distance changes, stay within limits, and ease slowly.
+    const zMag = Math.max(0, Math.abs(s.z) - t.depthDeadZone);
+    const z = Math.sign(s.z) * zMag;
+    const targetEz = Math.min(
+      t.eyeDistance * t.maxEyeDistanceScale,
+      Math.max(t.eyeDistance * t.minEyeDistanceScale, t.eyeDistance * (1 + z * t.depthSensitivity)),
+    );
+    if (smoothedEz.current === null) smoothedEz.current = t.eyeDistance;
+    const az = t.depthSmoothing <= 0 ? 1 : 1 - Math.exp(-dt / t.depthSmoothing);
+    smoothedEz.current += (targetEz - smoothedEz.current) * az;
 
-    camera.setEye(ex, ey, ez);
+    camera.setEye(ex, ey, smoothedEz.current);
 
     liveStats.rawPose = headInput.rawPose;
     liveStats.inputPose = raw;
