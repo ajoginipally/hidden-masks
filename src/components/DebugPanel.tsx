@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { tuning, useTuning, type Tuning } from '../config/tuning';
 import { liveStats } from '../debug/liveStats';
+import { doorPuzzle, useDoorPuzzle } from '../game/door/doorPuzzle';
+import { endingPuzzle, useEndingPuzzle } from '../game/ending/endingPuzzle';
+import { keyPuzzle, useKeyPuzzle } from '../game/key/keyPuzzle';
 import { maskDirector, useMaskGaze, type GazeTargetName } from '../game/mask/maskDirector';
 import { faceTracker, type TrackerStatus } from '../tracking/FaceTracker';
 import { headInput } from '../tracking/headInput';
@@ -37,7 +40,43 @@ const VIEW_SLIDERS: SliderDef[] = [
   { key: 'exaggerationY', label: 'Vertical exaggeration', min: 0, max: 3, step: 0.05 },
   { key: 'eyeDistance', label: 'Virtual eye distance', min: 1.5, max: 12, step: 0.1 },
   { key: 'maxDisplacement', label: 'Max displacement', min: 0.2, max: 4, step: 0.05 },
-  { key: 'keyTolerance', label: 'Key alignment tolerance', min: 0.01, max: 0.2, step: 0.005 },
+  { key: 'keyTolerance', label: 'Key alignment tolerance', min: 0.01, max: 0.25, step: 0.005 },
+];
+
+const KEY_SLIDERS: SliderDef[] = [
+  { key: 'keyTolerance', label: 'Alignment tolerance (NDC)', min: 0.01, max: 0.25, step: 0.005 },
+  { key: 'keySolveThreshold', label: 'Solve threshold', min: 0.7, max: 1, step: 0.01 },
+  { key: 'keyMinAnchorScore', label: 'Min per-anchor score', min: 0.5, max: 1, step: 0.01 },
+  { key: 'keyShimmerLow', label: 'Shimmer low', min: 0.4, max: 0.95, step: 0.01 },
+  { key: 'keyShimmerHigh', label: 'Shimmer high', min: 0.5, max: 0.99, step: 0.01 },
+  { key: 'keyHoldDuration', label: 'Hold duration (s)', min: 0.15, max: 2, step: 0.05 },
+  { key: 'keyOffsetX', label: 'Fragment offset X', min: -0.4, max: 0.4, step: 0.01 },
+  { key: 'keyOffsetY', label: 'Fragment offset Y', min: -0.4, max: 0.4, step: 0.01 },
+  { key: 'keyOffsetZ', label: 'Fragment offset Z', min: -0.4, max: 0.4, step: 0.01 },
+];
+
+/** Live silhouette sculpt — NDC is solve screen-space; depths are world Z. */
+const KEY_SILHOUETTE_SLIDERS: SliderDef[] = [
+  { key: 'keyBowNdcX', label: 'Bow NDC X', min: -0.6, max: 0.4, step: 0.01 },
+  { key: 'keyBowNdcY', label: 'Bow NDC Y', min: -0.4, max: 0.4, step: 0.01 },
+  { key: 'keyShaftLeftNdcX', label: 'Shaft L NDC X', min: -0.5, max: 0.5, step: 0.01 },
+  { key: 'keyShaftLeftNdcY', label: 'Shaft L NDC Y', min: -0.4, max: 0.4, step: 0.01 },
+  { key: 'keyShaftRightNdcX', label: 'Shaft R NDC X', min: -0.4, max: 0.6, step: 0.01 },
+  { key: 'keyShaftRightNdcY', label: 'Shaft R NDC Y', min: -0.4, max: 0.4, step: 0.01 },
+  { key: 'keyToothNdcX', label: 'Tooth NDC X', min: -0.3, max: 0.7, step: 0.01 },
+  { key: 'keyToothNdcY', label: 'Tooth NDC Y', min: -0.5, max: 0.3, step: 0.01 },
+  { key: 'keyDepthBow', label: 'Depth bow (Z)', min: -2.4, max: -0.4, step: 0.05 },
+  { key: 'keyDepthShaft', label: 'Depth shaft (Z)', min: -2.0, max: -0.3, step: 0.05 },
+  { key: 'keyDepthTooth', label: 'Depth tooth (Z)', min: -1.5, max: -0.15, step: 0.05 },
+];
+
+const DOOR_SLIDERS: SliderDef[] = [
+  { key: 'doorOffsetX', label: 'Door offset X', min: -0.35, max: 0.35, step: 0.01 },
+  { key: 'doorOffsetY', label: 'Door offset Y', min: -0.4, max: 0.4, step: 0.01 },
+  { key: 'doorOffsetZ', label: 'Door offset Z', min: -0.5, max: 0.5, step: 0.01 },
+  { key: 'occluderOffsetX', label: 'Occluder offset X', min: -0.35, max: 0.35, step: 0.01 },
+  { key: 'occluderOffsetY', label: 'Occluder offset Y', min: -0.4, max: 0.4, step: 0.01 },
+  { key: 'occluderOffsetZ', label: 'Occluder offset Z', min: -0.6, max: 0.6, step: 0.01 },
 ];
 
 const TRACKING_SLIDERS: SliderDef[] = [
@@ -138,8 +177,8 @@ export function DebugPanel({ open }: { open: boolean }) {
         <Row label="window w × h" value={`${fmt(win.width)} × ${fmt(win.height)}`} />
         <Row label="frustum l / r" value={`${fmt(f.left, 4)}  ${fmt(f.right, 4)}`} />
         <Row label="frustum b / t" value={`${fmt(f.bottom, 4)}  ${fmt(f.top, 4)}`} />
-        <Row label="key alignment" value="— (Milestone 4)" />
-        <Row label="puzzle state" value="MASK_PROTOTYPE" />
+        <Row label="key alignment" value={fmt(liveStats.alignmentScore)} />
+        <Row label="puzzle state" value={liveStats.keyPhase} />
         <Row label="fps" value={liveStats.fps.toFixed(0)} />
       </section>
 
@@ -160,6 +199,12 @@ export function DebugPanel({ open }: { open: boolean }) {
         <Toggle k="showCameraPreview" label="Show camera preview" value={t.showCameraPreview} />
       </section>
 
+      <KeySection />
+
+      <DoorSection />
+
+      <EndingSection />
+
       <MaskSection />
 
       <section className="debug-buttons">
@@ -171,6 +216,132 @@ export function DebugPanel({ open }: { open: boolean }) {
         <button onClick={() => tuning.reset()}>RESET TUNING</button>
       </section>
     </div>
+  );
+}
+
+function KeySection() {
+  const t = useTuning();
+  const k = useKeyPuzzle();
+  const [open, setOpen] = useState(true);
+
+  return (
+    <section>
+      <button className="debug-collapse" onClick={() => setOpen((o) => !o)}>
+        <span>KEY</span>
+        <span>{open ? '−' : '+'}</span>
+      </button>
+      {open && (
+        <>
+          <div className="debug-readout">
+            <Row label="phase" value={k.phase} />
+            <Row label="alignment" value={fmt(k.score)} />
+            <Row label="mean / min" value={`${fmt(k.mean)}  ${fmt(k.min)}`} />
+            <Row label="hold" value={`${(k.hold * 100).toFixed(0)}%`} />
+            <Row label="key found" value={k.keyFound ? 'YES' : 'no'} />
+          </div>
+          {KEY_SLIDERS.map((def) => (
+            <Slider key={def.key} def={def} value={t[def.key]} />
+          ))}
+          <div className="debug-label">SILHOUETTE (NDC / DEPTH)</div>
+          {KEY_SILHOUETTE_SLIDERS.map((def) => (
+            <Slider key={def.key} def={def} value={t[def.key]} />
+          ))}
+          <Toggle
+            k="showKeyAlignmentDebug"
+            label="Show alignment debug"
+            value={t.showKeyAlignmentDebug}
+          />
+          <Toggle
+            k="keyDisappearOnFound"
+            label="Disappear on found"
+            value={t.keyDisappearOnFound}
+          />
+          <div className="debug-buttons">
+            <button onClick={() => keyPuzzle.reset()}>RESET KEY PUZZLE</button>
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+function DoorSection() {
+  const t = useTuning();
+  const d = useDoorPuzzle();
+  const gaze = useMaskGaze();
+  const [open, setOpen] = useState(true);
+
+  return (
+    <section>
+      <button className="debug-collapse" onClick={() => setOpen((o) => !o)}>
+        <span>DOOR</span>
+        <span>{open ? '−' : '+'}</span>
+      </button>
+      {open && (
+        <>
+          <div className="debug-readout">
+            <Row label="key found" value={liveStats.keyFound ? 'YES' : 'no'} />
+            <Row label="mask clue active" value={d.clueActive ? 'YES' : 'no'} />
+            <Row label="mask gaze mode" value={gaze.mode} />
+            <Row label="mask gaze target" value={gaze.target} />
+            <Row label="door phase" value={d.phase} />
+            <Row label="door opened" value={d.opened ? 'YES' : 'no'} />
+            <Row label="open amount" value={fmt(d.openAmount)} />
+          </div>
+          {DOOR_SLIDERS.map((def) => (
+            <Slider key={def.key} def={def} value={t[def.key]} />
+          ))}
+          <Toggle
+            k="showDoorOccluderDebug"
+            label="Occluder wireframe"
+            value={t.showDoorOccluderDebug}
+          />
+          <div className="debug-buttons">
+            <button onClick={() => doorPuzzle.lookAtDoor()}>LOOK AT DOOR</button>
+            <button onClick={() => doorPuzzle.forceOpen()}>OPEN DOOR</button>
+            <button onClick={() => doorPuzzle.reset()}>RESET DOOR</button>
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+function EndingSection() {
+  const e = useEndingPuzzle();
+  const [open, setOpen] = useState(true);
+
+  return (
+    <section>
+      <button className="debug-collapse" onClick={() => setOpen((o) => !o)}>
+        <span>ENDING</span>
+        <span>{open ? '−' : '+'}</span>
+      </button>
+      {open && (
+        <>
+          <div className="debug-readout">
+            <Row label="ending phase" value={e.phase} />
+            <Row label="fragment restored" value={liveStats.fragmentRestored ? 'YES' : 'no'} />
+            <Row label="ending complete" value={liveStats.endingComplete ? 'YES' : 'no'} />
+            <Row label="door opened (gate)" value={liveStats.doorOpened ? 'YES' : 'no'} />
+          </div>
+          <p className="debug-note">
+            Debug force paths below may force-open the door for testing. They do not replace normal
+            door progression — use DOOR controls to verify real OPEN state.
+          </p>
+          <div className="debug-buttons">
+            <button onClick={() => endingPuzzle.forceFragmentAvailable()}>
+              FORCE FRAGMENT AVAILABLE
+            </button>
+            <button onClick={() => endingPuzzle.playRestoration()}>PLAY RESTORATION</button>
+            <button onClick={() => endingPuzzle.skipToAcknowledgement()}>
+              SKIP TO ACKNOWLEDGE
+            </button>
+            <button onClick={() => endingPuzzle.reset()}>RESET ENDING</button>
+          </div>
+        </>
+      )}
+    </section>
   );
 }
 

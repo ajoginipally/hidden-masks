@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from "react";
 
 /**
  * Live-tunable constants. Read every frame via `tuning.get()` (no React
@@ -37,8 +37,49 @@ export interface Tuning {
   eyeDistance: number;
   /** Max radial eye offset from the window center, in world units. */
   maxDisplacement: number;
-  /** Screen-space tolerance for puzzle alignment (used from Milestone 4). */
+  /** Screen-space tolerance for puzzle alignment (NDC distance → score 0). */
   keyTolerance: number;
+  /** Combined alignment score required to begin/continue HOLDING. */
+  keySolveThreshold: number;
+  /** Every required anchor must clear this before HOLDING can begin. */
+  keyMinAnchorScore: number;
+  /** Alignment score at which subtle shimmer begins. */
+  keyShimmerLow: number;
+  /** Alignment score at which stronger glow begins. */
+  keyShimmerHigh: number;
+  /** Seconds the solve threshold must be held before KEY FOUND. */
+  keyHoldDuration: number;
+  /** Live offset applied to the whole key fragment group (world units). */
+  keyOffsetX: number;
+  keyOffsetY: number;
+  keyOffsetZ: number;
+  /** Solve-silhouette NDC (screen space) for each anchor. */
+  keyBowNdcX: number;
+  keyBowNdcY: number;
+  keyShaftLeftNdcX: number;
+  keyShaftLeftNdcY: number;
+  keyShaftRightNdcX: number;
+  keyShaftRightNdcY: number;
+  keyToothNdcX: number;
+  keyToothNdcY: number;
+  /** World Z for each fragment layer (more negative = farther). */
+  keyDepthBow: number;
+  keyDepthShaft: number;
+  keyDepthTooth: number;
+  /** When true, fragments fade out after KEY FOUND. Off = stay visible for debugging. */
+  keyDisappearOnFound: boolean;
+  /** Dev only: show projected alignment anchors / ideal targets. */
+  showKeyAlignmentDebug: boolean;
+  /** Live offsets for the hidden door assembly (world units). */
+  doorOffsetX: number;
+  doorOffsetY: number;
+  doorOffsetZ: number;
+  /** Live offsets for the left occluder slab (world units). */
+  occluderOffsetX: number;
+  occluderOffsetY: number;
+  occluderOffsetZ: number;
+  /** Dev only: render the door occluder as wireframe for placement. */
+  showDoorOccluderDebug: boolean;
   /** Show the normalized head-position dot overlay. */
   showTrackingDot: boolean;
   /** Max face-tracking inferences per second (render rate is independent). */
@@ -78,11 +119,42 @@ export const DEFAULT_TUNING: Tuning = {
   smoothing: 0.14,
   headDeadZone: 0.04,
   perspectiveStrength: 1,
-  exaggerationX: 1.3,
+  /** Stronger lateral peek so left-wall doorway / fragment stay reachable. */
+  exaggerationX: 2.1,
   exaggerationY: 1.0,
   eyeDistance: 5,
-  maxDisplacement: 2,
-  keyTolerance: 0.05,
+  maxDisplacement: 2.8,
+  keyTolerance: 0.08,
+  keySolveThreshold: 0.95,
+  keyMinAnchorScore: 0.9,
+  keyShimmerLow: 0.7,
+  keyShimmerHigh: 0.85,
+  keyHoldDuration: 0.5,
+  keyOffsetX: 0,
+  keyOffsetY: 0,
+  keyOffsetZ: 0,
+  // Classic key: ring · long shaft · single thick tooth hanging from the tip.
+  keyBowNdcX: -0.2,
+  keyBowNdcY: 0.0,
+  keyShaftLeftNdcX: -0.04,
+  keyShaftLeftNdcY: 0,
+  keyShaftRightNdcX: 0.45,
+  keyShaftRightNdcY: 0,
+  // Keep tooth X near shaft tip so the bar is nearly vertical (same depth plane).
+  keyToothNdcX: 0.38,
+  keyToothNdcY: -0.1,
+  keyDepthBow: -1.3,
+  keyDepthShaft: -0.95,
+  keyDepthTooth: -0.45,
+  keyDisappearOnFound: true,
+  showKeyAlignmentDebug: false,
+  doorOffsetX: 0,
+  doorOffsetY: 0,
+  doorOffsetZ: 0,
+  occluderOffsetX: 0,
+  occluderOffsetY: 0,
+  occluderOffsetZ: 0,
+  showDoorOccluderDebug: false,
   showTrackingDot: true,
   trackingRate: 30,
   invertX: false,

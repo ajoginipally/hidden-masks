@@ -116,6 +116,12 @@ function createMaskDirector() {
       eyes.setGazeMode('LOOK_AT_WORLD_TARGET');
       emit();
     },
+    /** Look at an arbitrary world-space point (Milestone 5 door clue). */
+    lookAtWorld(position: Vector3, label = 'WORLD') {
+      eyes.setWorldTarget(position, label);
+      eyes.setGazeMode('LOOK_AT_WORLD_TARGET');
+      emit();
+    },
     blinkNow: () => lids.blink(),
     closeEyes: () => lids.close(),
     openEyes: () => lids.open(0.35),

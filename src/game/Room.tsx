@@ -20,7 +20,7 @@ export function Room() {
       <Wall width={W} height={H} position={[0, 0, -D]} rotation={[0, 0, 0]} />
       <Wall width={W} height={D} position={[0, -H / 2, -D / 2]} rotation={[-Math.PI / 2, 0, 0]} />
       <Wall width={W} height={D} position={[0, H / 2, -D / 2]} rotation={[Math.PI / 2, 0, 0]} />
-      <Wall width={D} height={H} position={[-W / 2, 0, -D / 2]} rotation={[0, Math.PI / 2, 0]} />
+      {/* Left wall is rendered by HiddenDoor as a split shell around the doorway cut. */}
       <Wall width={D} height={H} position={[W / 2, 0, -D / 2]} rotation={[0, -Math.PI / 2, 0]} />
       <Lights roomHeight={H} />
       <TestObjects roomHeight={H} />
@@ -62,30 +62,15 @@ function TestObjects({ roomHeight: H }: { roomHeight: number }) {
 
   return (
     <group>
-      {/* Foreground pillar hiding the orb from the neutral viewpoint (kept left of the mask). */}
-      <Block position={[-0.34, 0, -0.55]} size={[0.26, H, 0.26]} color={STONE} />
-
-      {/* Hidden orb — only visible by peeking around the pillar. */}
-      <mesh position={[-0.42, floor + 0.55 / 2, -1.9]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.025, 0.035, 0.55, 12]} />
-        <meshStandardMaterial color={STONE} roughness={0.9} />
-      </mesh>
-      <mesh position={[-0.42, floor + 0.55 + 0.07, -1.9]} castShadow>
-        <sphereGeometry args={[0.07, 24, 16]} />
-        <meshStandardMaterial color="#ff6a3a" emissive="#ff4a1a" emissiveIntensity={2.2} />
-      </mesh>
-
-      {/* Floor cubes at increasing depth. */}
-      <Block position={[-0.3, floor + 0.09, -0.3]} size={[0.18, 0.18, 0.18]} color={BRASS} metal />
+      {/* Floor cubes — left near-field cleared for the Milestone 5 occluder. */}
+      <Block position={[0.32, floor + 0.09, -0.35]} size={[0.18, 0.18, 0.18]} color={BRASS} metal />
       <Block position={[0.3, floor + 0.11, -1.1]} size={[0.22, 0.22, 0.22]} color={STONE} />
-      <Block position={[-0.28, floor + 0.25, -1.6]} size={[0.14, 0.5, 0.14]} color={STONE} />
-      <Block position={[-0.28, floor + 0.61, -1.6]} size={[0.22, 0.22, 0.22]} color={BRASS} metal />
       <Block position={[0.22, floor + 0.15, -2.2]} size={[0.3, 0.3, 0.3]} color={STONE} />
 
       {/* Hanging cubes. */}
-      <Hanging x={0.28} z={-0.7} drop={0.45} size={0.14} ceiling={ceiling} color={BRASS} metal />
-      <Hanging x={-0.22} z={-1.9} drop={0.3} size={0.2} ceiling={ceiling} color={STONE} />
-      <Block position={[0.3, 0.6, -1.4]} size={[0.12, 0.12, 0.12]} rotation={[0.6, 0.8, 0]} color={BRASS} metal />
+      <Hanging x={0.28} z={-0.7} drop={0.45} size={0.14} ceiling={ceiling} color={STONE} />
+      <Hanging x={0.18} z={-1.9} drop={0.3} size={0.2} ceiling={ceiling} color={STONE} />
+      <Block position={[0.32, 0.7, -1.5]} size={[0.12, 0.12, 0.12]} rotation={[0.6, 0.8, 0]} color={STONE} />
     </group>
   );
 }

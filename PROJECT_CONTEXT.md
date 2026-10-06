@@ -1,34 +1,45 @@
-# Hidden Masks — Project Context
+# Hidden Masks --- Project Context
 
-> **This document is the persistent source of truth for the project's concept, interaction model, technical architecture, design principles, and development roadmap.**
+> **This document is the persistent source of truth for the project's
+> concept, interaction model, technical architecture, design principles,
+> and development roadmap.**
 >
-> AI coding agents should read this document before making substantial changes to the project.
+> AI coding agents should read this document before making substantial
+> changes to the project.
 
----
+------------------------------------------------------------------------
 
 # 1. Project
 
 ## Hidden Masks
 
-**Hidden Masks** is a mobile-first perspective puzzle game where the player's physical viewpoint reveals things hidden inside miniature 3D worlds.
+**Hidden Masks** is a mobile-first perspective puzzle game where the
+player's physical viewpoint reveals things hidden inside miniature 3D
+worlds.
 
-The central interaction uses the device's **front-facing camera to estimate the player's head/eye position**.
+The central interaction uses the device's **front-facing camera to
+estimate the player's head/eye position**.
 
-That position drives a **head-coupled, off-axis perspective projection**, making the phone screen behave like a physical window into a miniature world.
+That position drives a **head-coupled, off-axis perspective
+projection**, making the phone screen behave like a physical window into
+a miniature world.
 
-The player does not primarily rotate the environment with touch controls.
+The player does not primarily rotate the environment with touch
+controls.
 
 Instead:
 
-> **Move your physical head → see the world from a different perspective.**
+> **Move your physical head → see the world from a different
+> perspective.**
 
 The desired illusion is:
 
-> **There is a tiny physical world behind the glass of my phone, and I can peek around inside it.**
+> **There is a tiny physical world behind the glass of my phone, and I
+> can peek around inside it.**
 
 This interaction is the foundation of Hidden Masks.
 
----
+------------------------------------------------------------------------
 
 # 2. Core Design Principle
 
@@ -38,25 +49,26 @@ The long-term design principle is:
 
 Masks are not simply collectibles or cosmetic objects.
 
-Each mask represents a different visual language or way of perceiving the world.
+Each mask represents a different visual language or way of perceiving
+the world.
 
 Potential mechanics include:
 
-- perspective alignment
-- occlusion
-- negative space
-- shadows
-- reflections
-- symmetry
-- scale
-- expression
-- color
-- depth
-- impossible geometry
+-   perspective alignment
+-   occlusion
+-   negative space
+-   shadows
+-   reflections
+-   symmetry
+-   scale
+-   expression
+-   color
+-   depth
+-   impossible geometry
 
 Future puzzles may combine multiple perceptual rules.
 
----
+------------------------------------------------------------------------
 
 # 3. Prototype Goal
 
@@ -64,47 +76,47 @@ The current project is a small proof-of-concept.
 
 It should demonstrate:
 
-1. Head-tracked perspective.
-2. The phone behaving like a virtual window.
-3. A mysterious mask that appears aware of the player.
-4. Perspective-dependent object alignment.
-5. Occlusion-based discovery.
-6. The mask communicating clues through its gaze.
+1.  Head-tracked perspective.
+2.  The phone behaving like a virtual window.
+3.  A mysterious mask that appears aware of the player.
+4.  Perspective-dependent object alignment.
+5.  Occlusion-based discovery.
+6.  The mask communicating clues through its gaze.
 
 Target playtime:
 
-**approximately 1–2 minutes.**
+**approximately 1--2 minutes.**
 
 Do not expand the scope until these interactions feel excellent.
 
----
+------------------------------------------------------------------------
 
 # 4. Technology
 
 Current stack:
 
-- React
-- TypeScript
-- Vite
-- Three.js
-- React Three Fiber where useful
-- MediaPipe Face Landmarker
-- CSS
-- Browser APIs
+-   React
+-   TypeScript
+-   Vite
+-   Three.js
+-   React Three Fiber where useful
+-   MediaPipe Face Landmarker
+-   CSS
+-   Browser APIs
 
 Primary targets:
 
-- iPhone Safari
-- Android Chrome
+-   iPhone Safari
+-   Android Chrome
 
 Desktop is supported primarily for development.
 
 Deployment target:
 
-- Vercel
-- HTTPS
+-   Vercel
+-   HTTPS
 
----
+------------------------------------------------------------------------
 
 # 5. Privacy
 
@@ -112,24 +124,25 @@ Front-camera processing should occur locally.
 
 Camera footage must never be:
 
-- uploaded
-- transmitted
-- recorded
-- stored
+-   uploaded
+-   transmitted
+-   recorded
+-   stored
 
 The normal game experience should NOT display the selfie camera feed.
 
 A developer-only preview may exist for debugging tracking.
 
----
+------------------------------------------------------------------------
 
 # 6. The Virtual Window
 
-The most important technical idea in Hidden Masks is that the display represents a stationary physical window.
+The most important technical idea in Hidden Masks is that the display
+represents a stationary physical window.
 
 Conceptually:
 
-```text
+``` text
                  PLAYER
 
                     👁
@@ -158,7 +171,7 @@ Therefore the projection changes.
 
 This should NOT be implemented as:
 
-```text
+``` text
 head moves right
       ↓
 rotate camera left
@@ -166,7 +179,7 @@ rotate camera left
 
 Instead:
 
-```text
+``` text
 head position
       ↓
 virtual eye position
@@ -178,7 +191,7 @@ stationary world viewed through stationary window
 
 This distinction is fundamental.
 
----
+------------------------------------------------------------------------
 
 # 7. Desired Perceptual Behavior
 
@@ -192,7 +205,7 @@ Previously occluded geometry may become visible.
 
 Likewise:
 
-```text
+``` text
 HEAD LEFT
 → see around objects from left
 
@@ -220,13 +233,13 @@ Not:
 
 > **I moved my head and controlled a videogame camera.**
 
----
+------------------------------------------------------------------------
 
 # 8. HeadPose
 
 Tracking should expose a normalized abstraction similar to:
 
-```ts
+``` ts
 interface HeadPose {
   x: number;
   y: number;
@@ -237,7 +250,7 @@ interface HeadPose {
 
 Rendering systems should not care where the pose originated.
 
----
+------------------------------------------------------------------------
 
 # 9. Input Architecture
 
@@ -245,7 +258,7 @@ Hidden Masks supports two input modes.
 
 ## Head Tracking
 
-```text
+``` text
 Front Camera
      ↓
 MediaPipe
@@ -257,7 +270,7 @@ OffAxisCamera
 
 ## Mouse / Touch Simulation
 
-```text
+``` text
 Mouse / Touch
      ↓
 simulated HeadPose
@@ -271,7 +284,7 @@ Do not create separate perspective implementations.
 
 Mouse/touch mode is critical for development and must remain available.
 
----
+------------------------------------------------------------------------
 
 # 10. Calibration
 
@@ -279,7 +292,7 @@ Head tracking requires a neutral position.
 
 Player flow:
 
-```text
+``` text
 POSITION YOURSELF
 
 Hold your phone comfortably
@@ -288,11 +301,12 @@ and look at the center.
 [ CALIBRATE ]
 ```
 
-Calibration should sample several valid tracking frames rather than relying on one frame.
+Calibration should sample several valid tracking frames rather than
+relying on one frame.
 
 Store approximately:
 
-```text
+``` text
 centerX
 centerY
 centerZ
@@ -300,7 +314,7 @@ centerZ
 
 Then:
 
-```text
+``` text
 currentPose - calibratedPose
 ```
 
@@ -308,7 +322,7 @@ becomes player displacement.
 
 Neutral position should map approximately to:
 
-```text
+``` text
 x = 0
 y = 0
 z = 0
@@ -316,7 +330,7 @@ z = 0
 
 Calibration only needs to persist for the current session.
 
----
+------------------------------------------------------------------------
 
 # 11. Tracking Smoothing
 
@@ -326,10 +340,10 @@ Smooth tracking before it reaches the virtual eye.
 
 Goals:
 
-- minimal jitter
-- responsive intentional movement
-- stable world when player stops
-- no obvious delayed/swimming feeling
+-   minimal jitter
+-   responsive intentional movement
+-   stable world when player stops
+-   no obvious delayed/swimming feeling
 
 Prefer frame-rate-independent smoothing.
 
@@ -339,7 +353,7 @@ If necessary:
 
 **prioritize stable X/Y over accurate Z.**
 
----
+------------------------------------------------------------------------
 
 # 12. Lost Tracking
 
@@ -359,25 +373,25 @@ Never abruptly snap the viewpoint.
 
 Debug status should distinguish:
 
-```text
+``` text
 CAMERA: ACTIVE
 FACE: DETECTED
 ```
 
 from:
 
-```text
+``` text
 CAMERA: ACTIVE
 FACE: NOT FOUND
 ```
 
 and:
 
-```text
+``` text
 CAMERA: BLOCKED
 ```
 
----
+------------------------------------------------------------------------
 
 # 13. Existing Debug System
 
@@ -387,23 +401,23 @@ Preserve it.
 
 Existing or planned tuning values include:
 
-- Head sensitivity X
-- Head sensitivity Y
-- Depth sensitivity
-- Smoothing
-- Perspective strength
-- Horizontal exaggeration
-- Vertical exaggeration
-- Virtual eye distance
-- Max displacement
-- Key alignment tolerance
-- Show tracking dot
-- Recenter view
-- Reset tuning
+-   Head sensitivity X
+-   Head sensitivity Y
+-   Depth sensitivity
+-   Smoothing
+-   Perspective strength
+-   Horizontal exaggeration
+-   Vertical exaggeration
+-   Virtual eye distance
+-   Max displacement
+-   Key alignment tolerance
+-   Show tracking dot
+-   Recenter view
+-   Reset tuning
 
 Debug information includes values such as:
 
-```text
+``` text
 head X / Y / Z
 smoothed X / Y / Z
 confidence
@@ -423,9 +437,9 @@ Do not remove it merely to simplify the UI.
 
 `D` should toggle the panel where appropriate.
 
----
+------------------------------------------------------------------------
 
-# 14. Milestone 1 — Virtual Window
+# 14. Milestone 1 --- Virtual Window
 
 ## STATUS: IMPLEMENTED AND TESTED
 
@@ -433,22 +447,23 @@ Milestone 1 created the virtual-window system.
 
 It includes:
 
-- 3D room
-- geometry at multiple depths
-- off-axis projection
-- mouse/touch simulated viewpoint
-- debug panel
-- tuning controls
+-   3D room
+-   geometry at multiple depths
+-   off-axis projection
+-   mouse/touch simulated viewpoint
+-   debug panel
+-   tuning controls
 
-The user has tested this system and confirmed that the perspective effect feels good.
+The user has tested this system and confirmed that the perspective
+effect feels good.
 
 Treat this as known-good infrastructure.
 
 Do not rewrite it unless an actual problem is identified.
 
----
+------------------------------------------------------------------------
 
-# 15. Milestone 2 — Head Tracking
+# 15. Milestone 2 --- Head Tracking
 
 ## STATUS: IMPLEMENTED AND TESTED ON DESKTOP
 
@@ -456,32 +471,34 @@ Milestone 2 integrated MediaPipe/front-camera head tracking.
 
 It includes or should include:
 
-- MediaPipe Face Landmarker
-- front-facing camera
-- X tracking
-- Y tracking
-- approximate Z
-- calibration
-- smoothing
-- sensitivity controls
-- tracking confidence
-- lost tracking behavior
-- mouse/touch fallback
-- debug information
+-   MediaPipe Face Landmarker
+-   front-facing camera
+-   X tracking
+-   Y tracking
+-   approximate Z
+-   calibration
+-   smoothing
+-   sensitivity controls
+-   tracking confidence
+-   lost tracking behavior
+-   mouse/touch fallback
+-   debug information
 
-The user has tested the behavior on their computer and confirmed it works well.
+The user has tested the behavior on their computer and confirmed it
+works well.
 
-The next important validation is testing the experience on an actual phone.
+The next important validation is testing the experience on an actual
+phone.
 
 Do not rewrite Milestone 1 or 2 while implementing later milestones.
 
----
+------------------------------------------------------------------------
 
 # 16. Mobile Testing
 
 The recommended mobile test path is:
 
-```text
+``` text
 repository
     ↓
 Vercel
@@ -493,8 +510,8 @@ phone browser
 
 Primary browsers:
 
-- Safari on iPhone
-- Chrome on Android
+-   Safari on iPhone
+-   Chrome on Android
 
 Camera APIs generally require secure contexts.
 
@@ -502,13 +519,13 @@ Do not assume plain LAN HTTP will reliably provide camera access.
 
 The production build should succeed with:
 
-```bash
+``` bash
 npm run build
 ```
 
 Avoid hardcoded localhost dependencies.
 
----
+------------------------------------------------------------------------
 
 # 17. The Mask
 
@@ -516,27 +533,27 @@ The mask is the central object/character of Hidden Masks.
 
 It should feel:
 
-- ancient
-- elegant
-- mysterious
-- observant
-- intelligent
-- slightly uncanny
-- restrained
+-   ancient
+-   elegant
+-   mysterious
+-   observant
+-   intelligent
+-   slightly uncanny
+-   restrained
 
 It should NOT feel:
 
-- overtly evil
-- like a horror monster
-- cartoonish
-- like a conventional NPC
+-   overtly evil
+-   like a horror monster
+-   cartoonish
+-   like a conventional NPC
 
 The mask communicates primarily through:
 
-- its eyes
-- gaze direction
-- blinking
-- extremely subtle movement
+-   its eyes
+-   gaze direction
+-   blinking
+-   extremely subtle movement
 
 The player should eventually understand:
 
@@ -546,31 +563,35 @@ and later:
 
 > **The mask can see things I cannot.**
 
----
+------------------------------------------------------------------------
 
 # 18. Cultural Direction
 
 The prototype mask should be original and fictional.
 
-Do not directly reproduce a specific culturally significant ceremonial mask.
+Do not directly reproduce a specific culturally significant ceremonial
+mask.
 
-The larger game may eventually draw thoughtful inspiration from masks and visual traditions from different regions.
+The larger game may eventually draw thoughtful inspiration from masks
+and visual traditions from different regions.
 
 Potential inspirations could include traditions involving:
 
-- theatrical masks
-- changing expression
-- shadow
-- reflection
-- transformation
-- symmetry
-- abstraction
+-   theatrical masks
+-   changing expression
+-   shadow
+-   reflection
+-   transformation
+-   symmetry
+-   abstraction
 
-Any real-world cultural inspiration should be researched and treated intentionally rather than turning sacred or ceremonial objects into generic fantasy power-ups.
+Any real-world cultural inspiration should be researched and treated
+intentionally rather than turning sacred or ceremonial objects into
+generic fantasy power-ups.
 
----
+------------------------------------------------------------------------
 
-# 19. Milestone 3 — The Mask
+# 19. Milestone 3 --- The Mask
 
 ## STATUS: CURRENT DEVELOPMENT MILESTONE
 
@@ -578,20 +599,20 @@ Milestone 3 introduces the central mask.
 
 It should:
 
-- exist physically inside the room
-- begin with closed eyes
-- awaken
-- establish eye contact
-- track the player's position
-- blink
-- subtly orient toward the player
-- deliberately look toward world-space targets
+-   exist physically inside the room
+-   begin with closed eyes
+-   awaken
+-   establish eye contact
+-   track the player's position
+-   blink
+-   subtly orient toward the player
+-   deliberately look toward world-space targets
 
 The emotional objective is:
 
 # Make the player feel like the mask can see them.
 
----
+------------------------------------------------------------------------
 
 # 20. Mask Geometry
 
@@ -603,18 +624,18 @@ Avoid introducing a complicated asset pipeline during this milestone.
 
 Suggested appearance:
 
-- pale stone / ceramic / aged ivory
-- dark eye sockets
-- subtle imperfections
-- restrained gold/brass details
-- recognizable silhouette
-- slightly non-human proportions
+-   pale stone / ceramic / aged ivory
+-   dark eye sockets
+-   subtle imperfections
+-   restrained gold/brass details
+-   recognizable silhouette
+-   slightly non-human proportions
 
 The mask should sit toward the center/back of the chamber.
 
 It is the visual focal point.
 
----
+------------------------------------------------------------------------
 
 # 21. Eyes
 
@@ -622,7 +643,7 @@ Create actual 3D eyes behind the eye openings.
 
 Approximate hierarchy:
 
-```text
+``` text
 Mask
 ├── MaskGeometry
 ├── LeftEye
@@ -643,13 +664,13 @@ Subtle catchlights are encouraged.
 
 The eyes carry most of the mask's personality.
 
----
+------------------------------------------------------------------------
 
 # 22. Awakening
 
 Initial sequence:
 
-```text
+``` text
 0.0s
 eyes closed
 
@@ -683,7 +704,7 @@ The intended player reaction is:
 
 Do not explain this moment with tutorial text.
 
----
+------------------------------------------------------------------------
 
 # 23. EyeController
 
@@ -691,13 +712,13 @@ Create a reusable gaze system.
 
 At minimum:
 
-```ts
+``` ts
 type GazeMode = "FOLLOW_PLAYER" | "LOOK_AT_WORLD_TARGET";
 ```
 
 Conceptual API:
 
-```ts
+``` ts
 setGazeMode("FOLLOW_PLAYER");
 
 setWorldTarget(position);
@@ -707,7 +728,7 @@ Do not tightly couple gaze logic to the mask mesh.
 
 Future puzzles will depend heavily on this system.
 
----
+------------------------------------------------------------------------
 
 # 24. FOLLOW_PLAYER
 
@@ -715,11 +736,12 @@ When following the player, use the existing virtual eye/player position.
 
 Prefer calculating a real 3D gaze target.
 
-Do not simply copy normalized X/Y directly into pupil translation unless necessary.
+Do not simply copy normalized X/Y directly into pupil translation unless
+necessary.
 
 Desired behavior:
 
-```text
+``` text
 PLAYER RIGHT
 → eyes RIGHT
 
@@ -737,7 +759,7 @@ The eyes should react quickly.
 
 The physical mask should follow slowly.
 
----
+------------------------------------------------------------------------
 
 # 25. Mask Movement
 
@@ -745,13 +767,13 @@ The mask itself should move VERY little.
 
 Starting target:
 
-**approximately 2–5° maximum rotation.**
+**approximately 2--5° maximum rotation.**
 
 The player should almost question whether it moved.
 
 Desired relationship:
 
-```text
+``` text
 EYES
 ████████████████
 fast
@@ -765,15 +787,16 @@ Too much movement makes the mask feel like an NPC.
 
 Restraint is important.
 
----
+------------------------------------------------------------------------
 
 # 26. Eye Contact
 
-When the player is approximately centered, the mask should appear to look directly at them.
+When the player is approximately centered, the mask should appear to
+look directly at them.
 
 Implement configurable:
 
-```text
+``` text
 eyeContactTolerance
 ```
 
@@ -781,22 +804,23 @@ Within that region, gently bias gaze toward direct eye contact.
 
 Do not snap.
 
-Eye contact is one of the most important emotional effects in the prototype.
+Eye contact is one of the most important emotional effects in the
+prototype.
 
----
+------------------------------------------------------------------------
 
 # 27. Blinking
 
 Implement:
 
-- synchronized normal blinking
-- quick eyelid movement
-- slightly varied intervals
-- restrained frequency
+-   synchronized normal blinking
+-   quick eyelid movement
+-   slightly varied intervals
+-   restrained frequency
 
 Developer controls:
 
-```text
+``` text
 AUTO BLINK
 ON / OFF
 
@@ -811,15 +835,16 @@ REPLAY AWAKENING
 
 Avoid behavior that is so random it becomes difficult to debug.
 
----
+------------------------------------------------------------------------
 
 # 28. World Gaze
 
-The mask must be capable of deliberately looking somewhere other than the player.
+The mask must be capable of deliberately looking somewhere other than
+the player.
 
 Create temporary world-space targets:
 
-```text
+``` text
 LEFT
 CENTER
 RIGHT
@@ -827,7 +852,7 @@ RIGHT
 
 Developer controls:
 
-```text
+``` text
 LOOK AT PLAYER
 
 LOOK LEFT
@@ -841,7 +866,7 @@ The important distinction:
 
 ## FOLLOW_PLAYER
 
-```text
+``` text
 player moves
       ↓
 mask continues following player
@@ -849,7 +874,7 @@ mask continues following player
 
 ## LOOK_AT_WORLD_TARGET
 
-```text
+``` text
 player moves
       ↓
 perspective changes
@@ -864,7 +889,7 @@ The player should be able to notice:
 
 This becomes part of the puzzle language.
 
----
+------------------------------------------------------------------------
 
 # 29. Mask Debug Controls
 
@@ -876,7 +901,7 @@ section.
 
 Include:
 
-```text
+``` text
 Gaze Mode
 PLAYER / WORLD
 
@@ -905,7 +930,7 @@ REPLAY AWAKENING
 
 Display:
 
-```text
+``` text
 current gaze mode
 current gaze target
 
@@ -917,7 +942,7 @@ mask rotation
 
 Do not remove existing tracking/camera controls.
 
----
+------------------------------------------------------------------------
 
 # 30. Milestone 3 Acceptance Criteria
 
@@ -961,7 +986,7 @@ Mask follows slightly afterward.
 
 Activate:
 
-```text
+``` text
 LOOK LEFT
 ```
 
@@ -983,17 +1008,17 @@ Head tracking continues working.
 
 Mask follows actual player movement.
 
----
+------------------------------------------------------------------------
 
-# 31. Milestone 4 — Perspective Key
+# 31. Milestone 4 --- Perspective Key
 
-## STATUS: PLANNED — DO NOT IMPLEMENT DURING MILESTONE 3
+## STATUS: PLANNED --- DO NOT IMPLEMENT DURING MILESTONE 3
 
 Three gold/brass objects exist at different depths.
 
 From the neutral viewpoint:
 
-```text
+``` text
      ◯
 
               ━━━
@@ -1005,7 +1030,7 @@ They appear unrelated.
 
 From the correct right-side perspective:
 
-```text
+``` text
         ╭─◯━━━━
         │
         │
@@ -1015,13 +1040,13 @@ They visually form a key.
 
 This is the first major perspective puzzle.
 
----
+------------------------------------------------------------------------
 
 # 32. Alignment Detection
 
 Do NOT implement the key using:
 
-```ts
+``` ts
 if (headX > threshold) {
   solveKey();
 }
@@ -1031,7 +1056,7 @@ Instead, determine whether the actual projected geometry aligns.
 
 Conceptually:
 
-```text
+``` text
 Fragment A
     ↓
 project to screen
@@ -1061,13 +1086,13 @@ alignmentScore
 
 Expose:
 
-```text
+``` text
 alignmentScore = 0 → 1
 ```
 
 Approximate response:
 
-```text
+``` text
 < 0.70
 nothing
 
@@ -1085,27 +1110,28 @@ hold alignment ~500ms
 
 Thresholds should be configurable.
 
-The alignment system should eventually be reusable for many perspective puzzles.
+The alignment system should eventually be reusable for many perspective
+puzzles.
 
----
+------------------------------------------------------------------------
 
 # 33. Key Discovery
 
 Once alignment is maintained:
 
-- brief visual snap
-- fragments glow
-- fragments appear unified momentarily
-- satisfying feedback
-- display `KEY FOUND`
-- fragments disappear/fade
-- tiny key indicator appears
+-   brief visual snap
+-   fragments glow
+-   fragments appear unified momentarily
+-   satisfying feedback
+-   display `KEY FOUND`
+-   fragments disappear/fade
+-   tiny key indicator appears
 
 No complex inventory system is needed.
 
----
+------------------------------------------------------------------------
 
-# 34. Milestone 5 — Hidden Door
+# 34. Milestone 5 --- Hidden Door
 
 ## STATUS: PLANNED
 
@@ -1125,7 +1151,7 @@ The mask itself provides the clue.
 
 The player follows its gaze.
 
----
+------------------------------------------------------------------------
 
 # 35. Occlusion Puzzle
 
@@ -1133,7 +1159,7 @@ A large architectural wall/pillar blocks a small hidden door.
 
 From neutral:
 
-```text
+``` text
         ██████
         ██████
         ██████
@@ -1141,7 +1167,7 @@ From neutral:
 
 From the opposite viewpoint:
 
-```text
+``` text
         ██████
        /██████
       / ██████
@@ -1161,19 +1187,19 @@ Perspective causes objects to align.
 
 Perspective reveals something hidden behind another object.
 
----
+------------------------------------------------------------------------
 
 # 36. Door Interaction
 
 Behind the obstruction:
 
-- small door
-- keyhole
-- subtle gold highlight
+-   small door
+-   keyhole
+-   subtle gold highlight
 
 If the key has been acquired and the player taps the door/keyhole:
 
-```text
+``` text
 KEY
  ↓
 LOCK
@@ -1185,7 +1211,7 @@ DOOR OPENS
 
 Warm light appears behind it.
 
----
+------------------------------------------------------------------------
 
 # 37. Prototype Ending
 
@@ -1221,11 +1247,11 @@ Then:
 
 **RESTART**
 
----
+------------------------------------------------------------------------
 
 # 38. Complete Prototype Flow
 
-```text
+``` text
 OPEN HIDDEN MASKS
         ↓
 ALLOW CAMERA
@@ -1281,7 +1307,7 @@ MASK LOOKS DIRECTLY AT PLAYER
 HIDDEN MASKS
 ```
 
----
+------------------------------------------------------------------------
 
 # 39. Puzzle State
 
@@ -1289,7 +1315,7 @@ Eventually use a simple state machine.
 
 Possible states:
 
-```ts
+``` ts
 type GameState =
   | "INTRO"
   | "CAMERA_PERMISSION"
@@ -1307,7 +1333,7 @@ type GameState =
 
 Avoid unnecessary global state libraries for the prototype.
 
----
+------------------------------------------------------------------------
 
 # 40. Potential Future Masks
 
@@ -1315,9 +1341,11 @@ These are design ideas, NOT implementation requirements.
 
 ## Expression
 
-The apparent emotional expression of a mask changes depending on viewing angle.
+The apparent emotional expression of a mask changes depending on viewing
+angle.
 
-This could draw thoughtful inspiration from theatrical traditions where angle and lighting affect perceived expression.
+This could draw thoughtful inspiration from theatrical traditions where
+angle and lighting affect perceived expression.
 
 ## Reflection / Identity
 
@@ -1331,10 +1359,10 @@ Physical objects appear meaningless.
 
 Their shadows form:
 
-- creatures
-- symbols
-- paths
-- instructions
+-   creatures
+-   symbols
+-   paths
+-   instructions
 
 ## Negative Space
 
@@ -1346,23 +1374,26 @@ Two unrelated halves become one object when viewed correctly.
 
 ## Scale
 
-Perspective changes apparent size relationships and allows impossible interactions.
+Perspective changes apparent size relationships and allows impossible
+interactions.
 
 ## Alignment
 
-Objects distributed throughout depth become symbols or tools from precise viewpoints.
+Objects distributed throughout depth become symbols or tools from
+precise viewpoints.
 
 ## Occlusion
 
-Important information exists behind geometry and requires physically peeking around it.
+Important information exists behind geometry and requires physically
+peeking around it.
 
----
+------------------------------------------------------------------------
 
 # 41. Masks as Progression
 
 The larger game could follow:
 
-```text
+``` text
 DISCOVER MASK
       ↓
 UNDERSTAND ITS VISUAL LANGUAGE
@@ -1378,11 +1409,12 @@ GAIN NEW PERCEPTUAL RULE
 USE RULE IN FUTURE PUZZLES
 ```
 
-Eventually puzzles could combine abilities/rules learned from multiple masks.
+Eventually puzzles could combine abilities/rules learned from multiple
+masks.
 
 This is long-term design direction only.
 
----
+------------------------------------------------------------------------
 
 # 42. The Mask as Silent Guide
 
@@ -1390,13 +1422,13 @@ Avoid conventional tutorial dialogue whenever possible.
 
 Instead of:
 
-```text
+``` text
 "Look behind the pillar!"
 ```
 
 the mask might simply:
 
-```text
+``` text
 👁  👁
  ↙  ↙
 ```
@@ -1411,16 +1443,17 @@ Later masks may behave differently.
 
 Possible future personalities expressed entirely through gaze:
 
-- calm mask — slow deliberate guidance
-- mischievous mask — looks away when caught staring
-- frightened mask — eyes dart toward hidden threats
-- proud mask — refuses eye contact
-- deceptive mask — occasionally provides false gaze clues
-- broken mask — one eye follows player while another watches something else
+-   calm mask --- slow deliberate guidance
+-   mischievous mask --- looks away when caught staring
+-   frightened mask --- eyes dart toward hidden threats
+-   proud mask --- refuses eye contact
+-   deceptive mask --- occasionally provides false gaze clues
+-   broken mask --- one eye follows player while another watches
+    something else
 
 Do not implement these yet.
 
----
+------------------------------------------------------------------------
 
 # 43. Important Separation: Head Tracking vs Eye Tracking
 
@@ -1436,11 +1469,12 @@ Later experimentation may attempt to estimate:
 
 These are different problems.
 
-Do NOT make accurate gaze estimation a dependency for the current prototype.
+Do NOT make accurate gaze estimation a dependency for the current
+prototype.
 
 For now:
 
-```text
+``` text
 HEAD POSITION
      ↓
 world perspective
@@ -1450,7 +1484,7 @@ mask follows player
 
 Later:
 
-```text
+``` text
 IRIS / GAZE ESTIMATION
      ↓
 what player is looking at
@@ -1458,7 +1492,7 @@ what player is looking at
 
 may become another mechanic.
 
----
+------------------------------------------------------------------------
 
 # 44. Performance
 
@@ -1470,7 +1504,7 @@ Face inference does not need to run every rendering frame.
 
 Possible architecture:
 
-```text
+``` text
 MediaPipe
 20–30 FPS
      ↓
@@ -1484,14 +1518,14 @@ requestAnimationFrame
 
 Prioritize:
 
-- low tracking latency
-- smooth camera movement
-- battery efficiency
-- stable mobile performance
+-   low tracking latency
+-   smooth camera movement
+-   battery efficiency
+-   stable mobile performance
 
 over unnecessary camera resolution.
 
----
+------------------------------------------------------------------------
 
 # 45. Mobile UX
 
@@ -1503,10 +1537,10 @@ Normal game UI should be extremely minimal.
 
 Avoid:
 
-- virtual joysticks
-- excessive buttons
-- permanent instructions
-- clutter
+-   virtual joysticks
+-   excessive buttons
+-   permanent instructions
+-   clutter
 
 The player's body is the primary camera controller.
 
@@ -1518,7 +1552,7 @@ offer:
 
 The prototype must remain usable.
 
----
+------------------------------------------------------------------------
 
 # 46. Development Philosophy
 
@@ -1526,7 +1560,7 @@ Build one mechanic at a time.
 
 Order:
 
-```text
+``` text
 M1 Virtual Window
       ↓
 M2 Head Tracking
@@ -1540,116 +1574,148 @@ M5 Door
 M6 Polish
 ```
 
-Do not implement multiple future milestones just because they appear straightforward.
+Do not implement multiple future milestones just because they appear
+straightforward.
 
 Each milestone exists to validate a different part of the experience.
 
----
+------------------------------------------------------------------------
 
 # 47. Critical Rules for AI Coding Agents
 
-## Rule 1 — The screen is a window.
+## Rule 1 --- The screen is a window.
 
 Do not turn head tracking into camera rotation.
 
-## Rule 2 — The viewer moves.
+## Rule 2 --- The viewer moves.
 
 The room remains stationary.
 
-## Rule 3 — Preserve working systems.
+## Rule 3 --- Preserve working systems.
 
 Milestones 1 and 2 are known-good.
 
 Do not rewrite them while adding unrelated features.
 
-## Rule 4 — Mouse simulation stays.
+## Rule 4 --- Mouse simulation stays.
 
 It is essential for development.
 
-## Rule 5 — Eyes carry the mask's personality.
+## Rule 5 --- Eyes carry the mask's personality.
 
 Keep physical mask motion restrained.
 
-## Rule 6 — Gaze is gameplay.
+## Rule 6 --- Gaze is gameplay.
 
 The mask's gaze will eventually communicate puzzle information.
 
-## Rule 7 — Perspective puzzles should use geometry.
+## Rule 7 --- Perspective puzzles should use geometry.
 
 Prefer projected alignment/occlusion over arbitrary `headX` triggers.
 
-## Rule 8 — Mobile is the actual target.
+## Rule 8 --- Mobile is the actual target.
 
 Desktop is primarily a development environment.
 
-## Rule 9 — Privacy matters.
+## Rule 9 --- Privacy matters.
 
 Camera data remains local.
 
-## Rule 10 — Stop at milestone boundaries.
+## Rule 10 --- Stop at milestone boundaries.
 
 Do not automatically implement future milestones.
 
----
+## Rule 11 --- Rooms must obey the environmental design guidelines.
+
+Before creating or substantially modifying room geometry, architecture,
+puzzle environments, doors, passages, occluders, or environmental props:
+
+**read `ROOM_DESIGN_GUIDELINES.md`.**
+
+Environmental geometry must have believable physical relationships to
+the room. Do not solve local visual or puzzle problems by adding
+disconnected, unsupported, or unintentionally floating geometry.
+
+Simple prototype art is acceptable.
+
+Broken spatial logic is not.
+
+------------------------------------------------------------------------
 
 # 48. Current Project Status
 
 Current status:
 
-```text
+``` text
 Milestone 1 — Virtual Window
 ✓ COMPLETE
 
 Milestone 2 — Head Tracking
-✓ COMPLETE / desktop tested
-○ physical-phone validation still important
+✓ COMPLETE
+○ continued physical-phone validation remains important
 
 Milestone 3 — Mask
-→ CURRENT
+✓ COMPLETE
 
 Milestone 4 — Perspective Key
-○ PLANNED
+✓ COMPLETE / POC validated
+○ perspective-puzzle authoring learnings documented for future use
 
 Milestone 5 — Hidden Door
-○ PLANNED
+→ FUNCTIONALLY IMPLEMENTED / ENVIRONMENTAL READABILITY PASS IN PROGRESS
+○ hidden-door occlusion, mask gaze clue, key interaction, door opening, and warm backlight implemented
+○ doorway must read as physically integrated architecture rather than a floating/freestanding prop
 
 Milestone 6 — Polish / Ending
 ○ PLANNED
 ```
 
----
+------------------------------------------------------------------------
 
 # 49. Current Instruction to Cursor
 
 Before making substantial changes:
 
-1. Read this entire file.
-2. Inspect the existing repository.
-3. Identify the existing OffAxisCamera implementation.
-4. Identify the HeadPose/input abstraction.
-5. Identify MediaPipe tracking.
-6. Identify calibration/smoothing.
-7. Identify mouse/touch simulation.
-8. Identify the debug/tuning system.
-9. Run the application.
-10. Run the production build.
+1.  Read this entire file.
+2.  If the task creates or substantially modifies a room, architecture,
+    environmental geometry, or puzzle-space composition, read
+    `ROOM_DESIGN_GUIDELINES.md`.
+3.  Inspect the existing repository.
+4.  Identify the existing OffAxisCamera implementation.
+5.  Identify the HeadPose/input abstraction.
+6.  Identify MediaPipe tracking.
+7.  Identify calibration/smoothing.
+8.  Identify mouse/touch simulation.
+9.  Identify the debug/tuning system.
+10. Run the application.
+11. Run the production build.
 
 Compare the existing implementation against this document.
 
-Do not assume filenames or architecture exactly match examples in this document.
+Do not assume filenames or architecture exactly match examples in this
+document.
 
 Preserve working code.
 
-If Milestones 1 and 2 are intact:
+Milestones 1--4 are known-good infrastructure.
 
-**continue with Milestone 3 only.**
+Milestone 5 gameplay is functionally implemented. Current work is
+limited to the environmental/readability pass for the hidden doorway.
 
-Do not proceed to Milestone 4 until explicitly instructed.
-
----
+## Do not proceed to Milestone 6 until explicitly instructed.
 
 # 50. Immediate Objective
 
-The next milestone succeeds if the player can look at the screen, move their head, and have the unmistakable feeling:
+The current objective is to make the Milestone 5 hidden doorway read as
+a believable architectural opening that is physically integrated into
+the chamber.
 
-# THE MASK IS WATCHING ME.
+The doorway should not appear to float or read as a freestanding prop.
+
+When opened, it should reveal convincing recessed depth and warm light
+beyond the threshold while preserving the existing occlusion puzzle,
+mask gaze clue, key interaction, and virtual-window behavior.
+
+Environmental work must follow `ROOM_DESIGN_GUIDELINES.md`.
+
+Do not increase puzzle difficulty or begin Milestone 6 during this pass.

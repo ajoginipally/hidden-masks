@@ -1,5 +1,5 @@
 import { useFrame, useThree } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import {
   BackSide,
   DoubleSide,
@@ -15,12 +15,13 @@ import { faceTracker } from '../../tracking/FaceTracker';
 import { headInput } from '../../tracking/headInput';
 import { aimAngles } from './EyeController';
 import { GAZE_TARGETS, maskDirector, useMaskGaze, type GazeTargetName } from './maskDirector';
+import { RestoredFragment } from '../ending/MaskFragment';
+import { MASK_POSITION, MASK_RESTORE_LOCAL, setMaskRestoreSlot } from './maskRestore';
 import { EYE, MASK_HEIGHT, MASK_WIDTH, surfaceZ } from './maskShape';
 import { getMaskTextures } from './maskTextures';
 import { DEG, stepSpring, type Spring1 } from './spring';
 
-/** Center of the mask, toward the back of the room. */
-export const MASK_POSITION = new Vector3(0, 0.2, -1.9);
+export { MASK_POSITION };
 
 const EYE_RADIUS = 0.05;
 const EYE_X = EYE.u * (MASK_WIDTH / 2);
@@ -72,6 +73,7 @@ export function Mask() {
   const tex = getMaskTextures();
 
   const root = useRef<Group>(null);
+  const restoreSlot = useRef<Group>(null);
   const rigs = useMemo(() => ({ left: newRig(), right: newRig() }), []);
   const state = useMemo(
     () => ({
@@ -85,6 +87,8 @@ export function Mask() {
     }),
     [],
   );
+
+  useEffect(() => () => setMaskRestoreSlot(null), []);
 
   useFrame(({ camera }, delta) => {
     const group = root.current;
@@ -177,6 +181,17 @@ export function Mask() {
 
       <Eye rig={rigs.left} x={-EYE_X} />
       <Eye rig={rigs.right} x={EYE_X} />
+
+      {/* Stable local slot — restored shard joins mask hierarchy here. */}
+      <group
+        ref={(g) => {
+          restoreSlot.current = g;
+          setMaskRestoreSlot(g);
+        }}
+        position={MASK_RESTORE_LOCAL}
+      >
+        <RestoredFragment />
+      </group>
     </group>
   );
 }

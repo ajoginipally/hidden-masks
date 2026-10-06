@@ -7,6 +7,12 @@ import { DebugPanel } from './components/DebugPanel';
 import { InputModeBar } from './components/InputModeBar';
 import { TrackingDot } from './components/TrackingDot';
 import { GazeTargetMarkers, Mask } from './game/mask/Mask';
+import { AlignmentDebugOverlay } from './game/key/AlignmentDebugOverlay';
+import { KeyAnchorMarkers, KeyFragments } from './game/key/KeyFragments';
+import { KeyFoundOverlay } from './game/key/KeyFoundOverlay';
+import { HiddenDoor } from './game/door/HiddenDoor';
+import { EndingOverlay } from './game/ending/EndingOverlay';
+import { MaskFragment } from './game/ending/MaskFragment';
 import { Room } from './game/Room';
 import { HeadTrackedCamera } from './rendering/HeadTrackedCamera';
 import { headInput } from './tracking/headInput';
@@ -44,7 +50,11 @@ export default function App() {
         <fog attach="fog" args={['#0a0705', 6, 13]} />
         <HeadTrackedCamera />
         <Room />
+        <HiddenDoor />
         <Mask />
+        <MaskFragment />
+        <KeyFragments />
+        <KeyAnchorMarkers />
         <GazeTargetMarkers visible={debugOpen} />
       </Canvas>
 
@@ -52,6 +62,9 @@ export default function App() {
       <div className="hint">
         {mode === 'head' ? 'MOVE YOUR HEAD · D DEBUG' : 'DRAG TO MOVE YOUR VIEWPOINT · R RECENTER · D DEBUG'}
       </div>
+      <KeyFoundOverlay />
+      <EndingOverlay />
+      <AlignmentDebugOverlay />
       <InputModeBar />
       <TrackingDot />
       <CameraPreview />
